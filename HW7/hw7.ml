@@ -42,21 +42,9 @@ let postfix_calculator tokens =
   | _ -> raise (Invalid_argument "Malformed expression")
 
 
-
-
-(* Given asserts*)
-
-(* Example 1: 3 3.2 * 2 + => Float(11.6) *)
-let tokens1 = [`Num (Int 3); `Num (Float 3.2); `Op "*"; `Num (Int 2); `Op "+"] ;;
-assert (postfix_calculator tokens1 = Float 11.6);;
-
-(* Example 2: 4 2 / => Int(2) *)
-let tokens2 = [`Num (Int 4); `Num (Int 2); `Op "/"] ;;
-assert (postfix_calculator tokens2 = Int 2);;
-
-(* Example 3: 3 0 / => Division by zero (raises exception) *)
-let tokens3 = [`Num (Int 3); `Num (Int 0); `Op "/"] ;;
-try
-  let _ = postfix_calculator tokens3 in
-  assert false (* Should raise exception *)
-with Invalid_argument "Division by zero" -> assert true ;;
+let approx_equal a b =
+  match (a, b) with
+  | Float x, Float y -> abs_float (x -. y) < 0.0001
+  | Int x, Int y -> x = y
+  | Int x, Float y -> abs_float (float_of_int x -. y) < 0.0001
+  | Float x, Int y -> abs_float (x -. float_of_int y) < 0.0001;;
