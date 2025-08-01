@@ -1,6 +1,6 @@
 /* *********** HW13 ***********
 
-Student names: 
+Student names: Alishaba Hayat, 
 Resources: 
 
 The overall goal of this assignment is to see how you well you can approach a new Prolog program. Start with a small and easy problem to solve and work your way up. Leave the early successful programs as comments so I can see your approach. Even if you can�t get very far, solving smaller easier problems along the way shows some skill with Prolog.
@@ -71,3 +71,45 @@ Swish also has other examples that may be useful.
 
 *********** */
 
+
+
+
+build_rooks(N, Rooks) :-
+    findall(C/M, (between(1,N,C), between(1,N,M)), Rooks).
+
+no_repeat([]).
+no_repeat([H|T]) :-
+    \+ member(H, T),
+    no_repeat(T).
+
+check_row_format([], [], []).
+check_row_format([C/M | Rest], [C | Cs], [M | Ms]) :-
+    check_row_format(Rest, Cs, Ms).
+
+valid_row(Row) :-
+    check_row_format(Row, Cs, Ms),
+    no_repeat(Cs),
+    no_repeat(Ms).
+
+solve_row(N, Row) :-
+    build_rooks(N, Rooks),
+    length(Row, N),
+    select_rooks(Row, Rooks),
+    valid_row(Row).
+
+select_rooks([], _).
+select_rooks([R|Rs], Rooks) :-
+    select(R, Rooks, Rest),
+    select_rooks(Rs, Rest).
+
+
+
+/* Sample query and output for N = 3:
+
+?- solve_row(3, Row).
+Row = [1/1, 2/3, 3/2] ;
+Row = [1/1, 3/2, 2/3] ;
+Row = [1/2, 2/1, 3/3] ;
+...
+
+*/
