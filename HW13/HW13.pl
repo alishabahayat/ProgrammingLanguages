@@ -1,6 +1,8 @@
+:- use_module(library(clpfd)).
+
 /* *********** HW13 ***********
 
-Student names: Alishaba Hayat, 
+Student names: Alishaba Hayat, Theodore Harsha
 Resources: 
 
 The overall goal of this assignment is to see how you well you can approach a new Prolog program. Start with a small and easy problem to solve and work your way up. Leave the early successful programs as comments so I can see your approach. Even if you can�t get very far, solving smaller easier problems along the way shows some skill with Prolog.
@@ -74,10 +76,14 @@ Swish also has other examples that may be useful.
 
 
 
+
+
+
+%all c/m pairs 
 build_rooks(N, Rooks) :-
     findall(C/M, (between(1,N,C), between(1,N,M)), Rooks).
 
-no_repeat([]).
+no_repeat([]). %like all_distinct from the slides
 no_repeat([H|T]) :-
     \+ member(H, T),
     no_repeat(T).
@@ -91,25 +97,59 @@ valid_row(Row) :-
     no_repeat(Cs),
     no_repeat(Ms).
 
-solve_row(N, Row) :-
-    build_rooks(N, Rooks),
+%changed to 4 
+solve_row(N, Row, RooksIn, RooksOut) :-
     length(Row, N),
-    select_rooks(Row, Rooks),
-    valid_row(Row).
+    select_rooks(Row, RooksIn),
+    valid_row(Row),
+    subtract(RooksIn, Row, RooksOut).
+
 
 select_rooks([], _).
 select_rooks([R|Rs], Rooks) :-
     select(R, Rooks, Rest),
     select_rooks(Rs, Rest).
 
+% get c/m at the index for ALL rows
+column_values(_, [], []).
+column_values(Index, [Row|Rows],[Val|Vals]) :-
+    nth1(Index, Row, C/M),
+    Val = C/M, 
+    column_values(Index, Rows, Vals).
+
+%check repeats of c or m
+valid_cols(Board) :-
+    transpose(Board, Columns),
+    forall(member(Col, Columns),
+           ( check_row_format(Col, Cs, Ms),
+             no_repeat(Cs),
+             no_repeat(Ms) )).
+
+%build theb solve
+solve_board(N, Board) :-
+    build_rooks(N, AllRooks),
+    finish_rows(N, N, AllRooks, [], Board).
+
+%row by row checks validity and adds to ovr board
+finish_rows(0, _, _, Board, Board) :- !.
+finish_rows(RowsLeft, N, RooksAvail, Partial, Board) :-
+    solve_row(N, Row, RooksAvail, RooksLeft),
+    append(Partial, [Row], NewPartial),
+    valid_cols(NewPartial),
+    R1 is RowsLeft - 1,
+    finish_rows(R1, N, RooksLeft, NewPartial, Board).
 
 
-/* Sample query and output for N = 3:
+/*?- solve_board(3, B), maplist(writeln, B).
+[1/1,2/2,3/3]
+[2/3,3/1,1/2]
+[3/2,1/3,2/1]
+B = [[1/1, 2/2, 3/3], [2/3, 3/1, 1/2], [3/2, 1/3, 2/1]] .
 
-?- solve_row(3, Row).
-Row = [1/1, 2/3, 3/2] ;
-Row = [1/1, 3/2, 2/3] ;
-Row = [1/2, 2/1, 3/3] ;
-...
-
+?- solve_board(4, B), maplist(writeln, B).
+[1/1,2/2,3/3,4/4]
+[2/3,1/4,4/1,3/2]
+[3/4,4/3,1/2,2/1]
+[4/2,3/1,2/4,1/3]
+B = [[1/1, 2/2, 3/3, 4/4], [2/3, 1/4, 4/1, 3/2], [3/4, 4/3, 1/2, 2/1], [4/2, 3/1, 2/4, 1/3]] 
 */
