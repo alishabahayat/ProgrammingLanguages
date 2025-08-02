@@ -94,8 +94,8 @@ check_row_format([C/M | Rest], [C | Cs], [M | Ms]) :-
 
 valid_row(Row) :-
     check_row_format(Row, Cs, Ms),
-    no_repeat(Cs),
-    no_repeat(Ms).
+    all_distinct(Cs),
+    all_distinct(Ms).
 
 %changed to 4 
 solve_row(N, Row, RooksIn, RooksOut) :-
@@ -129,6 +129,7 @@ valid_cols(Board) :-
 solve_board(N, Board) :-
     build_rooks(N, AllRooks),
     finish_rows(N, N, AllRooks, [], Board).
+    
 
 %row by row checks validity and adds to ovr board
 finish_rows(0, _, _, Board, Board) :- !.
@@ -152,4 +153,19 @@ B = [[1/1, 2/2, 3/3], [2/3, 3/1, 1/2], [3/2, 1/3, 2/1]] .
 [3/4,4/3,1/2,2/1]
 [4/2,3/1,2/4,1/3]
 B = [[1/1, 2/2, 3/3, 4/4], [2/3, 1/4, 4/1, 3/2], [3/4, 4/3, 1/2, 2/1], [4/2, 3/1, 2/4, 1/3]] 
+
+?- solve_board(5,B), maplist(writeln, B).
+[1/1,2/2,3/3,4/4,5/5]
+[2/3,3/4,4/5,5/1,1/2]
+[3/5,4/1,5/2,1/3,2/4]
+[4/2,5/3,1/4,2/5,3/1]
+[5/4,1/5,2/1,3/2,4/3]
+B = [[1/1, 2/2, 3/3, 4/4, 5/5], [2/3, 3/4, 4/5, 5/1, 1/2], [3/5, 4/1, 5/2, 1/3, 2/4], [4/2, 5/3, 1/4, 2/5, 3/1], [5/4, 1/5, 2/1, 3/2, 4/3]].
+
+?- solve_board(6,B), maplist(writeln, B).
+This method can be solved however it takes a long time to run due to the number of combinations.
+?- solve_board(7,B), maplist(writeln, B).
+This method can be solved however it takes a long time to run due to the number of combinations.
+?- solve_board(8,B), maplist(writeln, B).
+This method can be solved however it takes a long time to run due to the number of combinations.
 */
